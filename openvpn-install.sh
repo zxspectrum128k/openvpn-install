@@ -131,6 +131,10 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 		done
 		[[ -z "$public_ip" ]] && public_ip="$get_public_ip"
 	fi
+	echo
+	echo "You can set domain name for new users:"
+	read -p "DNS Address [default: $public_ip]: " dns_name
+	[[ -z "$dns_name" ]] && dns_name="$public_ip"
 	# If system has a single IPv6, it is selected automatically
 	if [[ $(ip -6 addr | grep -c 'inet6 [23]') -eq 1 ]]; then
 		ip6=$(ip -6 addr | grep 'inet6 [23]' | cut -d '/' -f 1 | grep -oE '([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}')
@@ -409,7 +413,7 @@ WantedBy=multi-user.target" >> /etc/systemd/system/openvpn-iptables.service
 	echo "client
 dev tun
 proto $protocol
-remote $ip $port
+remote $dns_name $port
 resolv-retry infinite
 nobind
 persist-key
